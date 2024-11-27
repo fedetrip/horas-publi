@@ -16,7 +16,7 @@ export default function Navbar() {
     }
 
     switch (path) {
-      case "/":
+      case "/horas-publi":
         return "Listado de Días"; // O cualquier nombre para la página principal
       case "/nuevo":
         return "Agregar Día";
