@@ -12,6 +12,7 @@ import {
 } from "@mui/material";
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { validateDay, isFormValid } from "../utils/validations";
 
 const EditDay = () => {
   const { timestampEntrada } = useParams();
@@ -44,19 +45,46 @@ const EditDay = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
 
+    // Crear timestamps temporales para validación
+    const fechaEntrada = new Date(form.fechaEntrada);
+    const [horasEntrada, minutosEntrada] = form.horaEntrada
+      .split(":")
+      .map(Number);
+    fechaEntrada.setHours(horasEntrada, minutosEntrada, 0, 0);
+    const nuevoTimestampEntrada = fechaEntrada.getTime();
+
+    const fechaSalida = new Date(form.fechaSalida);
+    const [horasSalida, minutosSalida] = form.horaSalida.split(":").map(Number);
+    fechaSalida.setHours(horasSalida, minutosSalida, 0, 0);
+    const nuevoTimestampSalida = fechaSalida.getTime();
+
     const updatedDay = {
       ...form,
-      timestampEntrada: Number(timestampEntrada), // Mantener el timestamp del día editado
+      timestampEntrada: nuevoTimestampEntrada,
+      timestampSalida: nuevoTimestampSalida,
     };
 
-    // Actualizar solo el día correspondiente en el array de días
+    // Leer jornadas existentes ignorando la actual jornada (usando el original)
+    const filteredDays = existingDays.filter(
+      (day) => day.timestampEntrada !== Number(timestampEntrada)
+    );
+
+    // Validar el día
+    const errors = validateDay(updatedDay, filteredDays);
+
+    if (errors.length > 0) {
+      alert(`Errores de validación:\n- ${errors.join("\n- ")}`);
+      return;
+    }
+
+    // Actualizar la jornada en el array existente
     const updatedDays = existingDays.map((day) =>
       day.timestampEntrada === Number(timestampEntrada) ? updatedDay : day
     );
 
-    // Guardar el array actualizado en localStorage
+    // Guardar jornadas actualizadas en localStorage
     localStorage.setItem("days", JSON.stringify(updatedDays));
-    navigate("/"); // Navegar de regreso a la lista de días
+    navigate("/");
   };
 
   return (
@@ -65,14 +93,6 @@ const EditDay = () => {
       onSubmit={handleSubmit}
       padding={2}
     >
-      <Typography
-        variant="h4"
-        gutterBottom
-        marginBottom={2}
-      >
-        Editar Día
-      </Typography>
-
       <FormControl
         fullWidth
         margin="normal"
@@ -162,7 +182,7 @@ const EditDay = () => {
               onChange={handleChange}
             />
           }
-          label="Penalidad"
+          label="Penalty"
           sx={{ margin: "normal" }}
         />
         {form.penalidad && (
