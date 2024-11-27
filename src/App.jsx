@@ -22,7 +22,7 @@ function App() {
       >
         <Routes>
           <Route
-            path="/horas-publi"
+            path="/"
             element={<Home />}
           />
 

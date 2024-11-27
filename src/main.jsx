@@ -1,6 +1,6 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
-import { BrowserRouter } from "react-router-dom";
+import { HashRouter } from "react-router-dom";
 
 import App from "./App.jsx";
 import "@fontsource/roboto/300.css";
@@ -16,12 +16,12 @@ import { theme } from "./utils/theme";
 createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <ThemeProvider theme={theme}>
-      <BrowserRouter>
+      <HashRouter>
         <CssBaseline />
         <SnackbarProvider>
           <App />
         </SnackbarProvider>
-      </BrowserRouter>
+      </HashRouter>
     </ThemeProvider>
   </React.StrictMode>
 );
