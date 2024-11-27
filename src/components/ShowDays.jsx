@@ -97,7 +97,7 @@ const ShowDays = () => {
         width: "95vw",
         display: "flex",
         flexDirection: "column",
-        minHeight: "90vh", // Asegura que el contenedor ocupe toda la altura de la página
+        height: "90vh", // Asegura que el contenedor ocupe toda la altura de la página
         justifyContent: "center",
       }}
     >
@@ -133,7 +133,7 @@ const ShowDays = () => {
                     day.horaSalida
                   } ${
                     day.penalidad
-                      ? `- Penalty: ${day.minutosPenalidad} minutos`
+                      ? `- Penalty: ${day.minutosPenalidad} min`
                       : ""
                   }`}
                 />
@@ -173,17 +173,29 @@ const ShowDays = () => {
             gap: 2,
           }}
         >
-          <Button
-            variant="outlined"
-            color="secondary"
-            onClick={() => {
-              navigate("/results");
-              /* Lógica para calcular cierre */
+          <Box
+            sx={{
+              marginTop: 2,
+              position: "absolute",
+              bottom: 0,
+              width: "100%",
+              backgroundColor: "background.paper",
+              padding: 2,
+              display: "flex",
+              justifyContent: "center",
+              gap: 4,
             }}
           >
-            Calcular Cierre
-          </Button>
-          <Button onClick={deleteAllDays}>Borrar todos</Button>
+            <Button
+              color="secondary"
+              onClick={() => {
+                navigate("/results");
+              }}
+            >
+              Calcular Cierre
+            </Button>
+            <Button onClick={deleteAllDays}>Borrar todos</Button>
+          </Box>
         </Box>
       )}
     </Box>

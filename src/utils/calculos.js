@@ -83,7 +83,7 @@ export const formatearResultados = ({
     {
       concepto: "Horas Extras",
       detalle: "300%",
-      cantidad: formatNumber(horasExtras.horasExtras300) || " - ",
+      cantidad: formatNumber(horasExtras.horasExtras300) || 0,
     },
   ];
 };

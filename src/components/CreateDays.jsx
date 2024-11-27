@@ -75,12 +75,10 @@ const CreateDays = () => {
       component="form"
       onSubmit={handleSubmit}
       padding={2}
+      fullWidth
       sx={{
         width: "100vw",
         height: "100vh",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
       }}
     >
       <FormControl
@@ -96,6 +94,7 @@ const CreateDays = () => {
           onChange={handleChange}
           label="Tipo de Jornada"
           required
+          fullWidth
         >
           <MenuItem value={8}>8 horas</MenuItem>
           <MenuItem value={12}>12 horas</MenuItem>
@@ -172,11 +171,11 @@ const CreateDays = () => {
             />
           }
           label="Penalty"
-          sx={{ margin: "normal" }}
+          sx={{ margin: "normal", height: "100%" }}
         />
         {form.penalidad && (
           <TextField
-            label="Minutos de Penalidad"
+            label="Minutos de Penalty"
             type="number"
             name="minutosPenalidad"
             value={form.minutosPenalidad}
@@ -186,15 +185,35 @@ const CreateDays = () => {
           />
         )}
       </Box>
-      <Box sx={{ display: "flex", justifyContent: "center" }}>
-        <Button
-          type="submit"
-          variant="contained"
-          color="primary"
-          sx={{ marginTop: 2 }}
+      <Box
+        sx={{
+          marginTop: "auto", // Empuja los botones al fondo
+          padding: 2,
+          display: "flex",
+          justifyContent: "center",
+          gap: 2,
+        }}
+      >
+        <Box
+          sx={{
+            marginTop: 2,
+            position: "absolute",
+            bottom: 0,
+            width: "100%",
+            backgroundColor: "background.paper",
+            padding: 2,
+            display: "flex",
+            justifyContent: "center",
+            gap: 4,
+          }}
         >
-          Guardar
-        </Button>
+          <Button
+            type="submit"
+            color="primary"
+          >
+            Guardar
+          </Button>
+        </Box>
       </Box>
     </Box>
   );
