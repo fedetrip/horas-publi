@@ -12,6 +12,7 @@ import {
 } from "@mui/material";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { validateDay, isFormValid } from "../utils/validations";
 
 const CreateDays = () => {
   const [form, setForm] = useState({
@@ -37,31 +38,36 @@ const CreateDays = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    // Combinar fecha y hora de entrada y salida ajustando al horario local
-    const fechaHoraEntrada = new Date(
-      `${form.fechaEntrada}T${form.horaEntrada}:00`
-    );
-    const fechaHoraSalida = new Date(
-      `${form.fechaSalida}T${form.horaSalida}:00`
-    );
+    // Crear timestamps como antes
+    const fechaEntrada = new Date(form.fechaEntrada);
+    const [horasEntrada, minutosEntrada] = form.horaEntrada
+      .split(":")
+      .map(Number);
+    fechaEntrada.setHours(horasEntrada, minutosEntrada, 0, 0);
+    const timestampEntrada = fechaEntrada.getTime();
 
-    // Crear timestamp con ajuste de zona horaria local
-    const timestampEntrada = fechaHoraEntrada.getTime();
-    const timestampSalida = fechaHoraSalida.getTime();
+    const fechaSalida = new Date(form.fechaSalida);
+    const [horasSalida, minutosSalida] = form.horaSalida.split(":").map(Number);
+    fechaSalida.setHours(horasSalida, minutosSalida, 0, 0);
+    const timestampSalida = fechaSalida.getTime();
 
-    // Añadir el timestamp al objeto de jornada
-    const jornadaConTimestamp = {
-      ...form,
-      timestampEntrada,
-      timestampSalida,
-    };
+    const day = { ...form, timestampEntrada, timestampSalida };
 
+    // Leer jornadas existentes
     const existingDays = JSON.parse(localStorage.getItem("days")) || [];
-    const updatedDays = [...existingDays, jornadaConTimestamp];
 
-    // Guardar en localStorage
+    // Validar el día
+    const errors = validateDay(day, existingDays);
+
+    if (errors.length > 0) {
+      alert(`Errores de validación:\n- ${errors.join("\n- ")}`);
+      return;
+    }
+
+    // Guardar datos si son válidos
+    const updatedDays = [...existingDays, day];
     localStorage.setItem("days", JSON.stringify(updatedDays));
-    navigate("/"); // Navegar de regreso a la lista de días
+    navigate("/");
   };
 
   return (
@@ -70,14 +76,6 @@ const CreateDays = () => {
       onSubmit={handleSubmit}
       padding={2}
     >
-      <Typography
-        variant="h4"
-        gutterBottom
-        marginBottom={2}
-      >
-        Crear Día
-      </Typography>
-
       <FormControl
         fullWidth
         margin="normal"
@@ -166,7 +164,7 @@ const CreateDays = () => {
               onChange={handleChange}
             />
           }
-          label="Penalidad"
+          label="Penalty"
           sx={{ margin: "normal" }}
         />
         {form.penalidad && (
