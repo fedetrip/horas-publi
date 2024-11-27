@@ -75,6 +75,13 @@ const CreateDays = () => {
       component="form"
       onSubmit={handleSubmit}
       padding={2}
+      sx={{
+        width: "100vw",
+        height: "100vh",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+      }}
     >
       <FormControl
         fullWidth
