@@ -1,5 +1,4 @@
-import { Card, CardContent, Typography } from "@mui/material";
-
+/* eslint-disable react/prop-types */
 export default function CardDay({ day }) {
   const {
     tipoJornada,
@@ -12,16 +11,14 @@ export default function CardDay({ day }) {
   } = day;
 
   return (
-    <Card>
-      <CardContent>
-        <Typography variant="h6">Tipo de Jornada: {tipoJornada}</Typography>
-        <Typography>Fecha de Entrada: {fechaEntrada}</Typography>
-        <Typography>Hora de Entrada: {horaEntrada}</Typography>
-        <Typography>Fecha de Salida: {fechaSalida}</Typography>
-        <Typography>Hora de Salida: {horaSalida}</Typography>
-        <Typography>Penalidad: {penalidad}</Typography>
-        <Typography>Minutos de Penalidad: {minutosPenalidad}</Typography>
-      </CardContent>
-    </Card>
+    <div className="border rounded shadow p-4">
+      <p className="font-semibold">Tipo de Jornada: {tipoJornada}</p>
+      <p>Fecha de Entrada: {fechaEntrada}</p>
+      <p>Hora de Entrada: {horaEntrada}</p>
+      <p>Fecha de Salida: {fechaSalida}</p>
+      <p>Hora de Salida: {horaSalida}</p>
+      <p>Penalidad: {penalidad ? "Sí" : "No"}</p>
+      {penalidad && <p>Minutos de Penalidad: {minutosPenalidad}</p>}
+    </div>
   );
 }

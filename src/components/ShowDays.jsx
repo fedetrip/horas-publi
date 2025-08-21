@@ -1,39 +1,19 @@
-import {
-  Box,
-  Button,
-  Typography,
-  List,
-  ListItemText,
-  Divider,
-  ListItem,
-  IconButton,
-  Menu,
-  MenuItem,
-} from "@mui/material";
-import MoreVertIcon from "@mui/icons-material/MoreVert";
-import Swal from "sweetalert2";
-import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import Swal from "sweetalert2";
 
 const ShowDays = () => {
   const [days, setDays] = useState([]);
-  const [anchorEl, setAnchorEl] = useState(null); // Estado para el menú
-  const [selectedDay, setSelectedDay] = useState(null); // Día seleccionado
+  const [menuDay, setMenuDay] = useState(null);
   const navigate = useNavigate();
 
-  const handleMenuClick = (event, day) => {
-    setAnchorEl(event.currentTarget);
-    setSelectedDay(day); // Guarda el día seleccionado
-  };
-
-  const handleClose = () => {
-    setAnchorEl(null);
-    setSelectedDay(null);
-  };
-
-  const addDay = () => {
-    navigate("/nuevo");
-  };
+  useEffect(() => {
+    const storedDays = JSON.parse(localStorage.getItem("days")) || [];
+    const sortedDays = storedDays.sort(
+      (a, b) => a.timestampEntrada - b.timestampEntrada
+    );
+    setDays(sortedDays);
+  }, []);
 
   const deleteAllDays = () => {
     Swal.fire({
@@ -47,17 +27,13 @@ const ShowDays = () => {
     }).then((result) => {
       if (result.isConfirmed) {
         localStorage.removeItem("days");
-        setDays([]); // Actualizar el estado para reflejar los cambios en la interfaz
-
-        Swal.fire({
-          title: "Borrado!",
-          icon: "success",
-        });
+        setDays([]);
+        Swal.fire({ title: "Borrado!", icon: "success" });
       }
     });
   };
 
-  const deleteDay = () => {
+  const deleteDay = (day) => {
     Swal.fire({
       title: "Estas Seguro?",
       text: "Borraras este día!",
@@ -69,136 +45,92 @@ const ShowDays = () => {
     }).then((result) => {
       if (result.isConfirmed) {
         const updatedDays = days.filter(
-          (day) => day.timestampEntrada !== selectedDay.timestampEntrada
+          (d) => d.timestampEntrada !== day.timestampEntrada
         );
         localStorage.setItem("days", JSON.stringify(updatedDays));
         setDays(updatedDays);
-        handleClose(); // Cerrar el menú
-
-        Swal.fire({
-          title: "Borrado!",
-          icon: "success",
-        });
+        Swal.fire({ title: "Borrado!", icon: "success" });
       }
     });
   };
 
-  useEffect(() => {
-    const storedDays = JSON.parse(localStorage.getItem("days")) || [];
-    const sortedDays = storedDays.sort(
-      (a, b) => a.timestampEntrada - b.timestampEntrada
-    );
-    setDays(sortedDays);
-  }, []);
-
   return (
-    <Box
-      sx={{
-        width: "95vw",
-        display: "flex",
-        flexDirection: "column",
-        height: "90vh", // Asegura que el contenedor ocupe toda la altura de la página
-        justifyContent: "center",
-      }}
-    >
-      <Box marginTop={1}>
-        <List sx={{ width: "100%" }}>
-          {days.map((day, index) => (
-            <div key={index}>
-              <ListItem
-                sx={{
-                  borderBottom: "1px solid rgba(0, 0, 0, 0.12)",
-                }}
-                secondaryAction={
-                  <IconButton
-                    edge="end"
-                    aria-label="menu"
-                    onClick={(event) => handleMenuClick(event, day)}
-                  >
-                    <MoreVertIcon />
-                  </IconButton>
-                }
-              >
-                <ListItemText
-                  primary={`Fecha: ${(() => {
-                    const fechaProcesada = new Date(day.fechaEntrada);
-                    fechaProcesada.setDate(fechaProcesada.getDate() + 1);
-                    return fechaProcesada.toLocaleDateString("es-AR", {
-                      year: "numeric",
-                      month: "2-digit",
-                      day: "2-digit",
-                    });
-                  })()} - Jornada de ${day.tipoJornada} horas`}
-                  secondary={`Entrada: ${day.horaEntrada} - Salida: ${
-                    day.horaSalida
-                  } ${
-                    day.penalidad
-                      ? `- Penalty: ${day.minutosPenalidad} min`
-                      : ""
-                  }`}
-                />
-              </ListItem>
-
-              {index < days.length - 1 && <Divider />}
-            </div>
-          ))}
-        </List>
-      </Box>
-
-      {/* Menú de opciones */}
-      <Menu
-        anchorEl={anchorEl}
-        open={Boolean(anchorEl)}
-        onClose={handleClose}
-      >
-        <MenuItem
-          onClick={() => {
-            handleClose();
-            navigate(`/editar/${selectedDay.timestampEntrada}`);
-          }}
-        >
-          Editar
-        </MenuItem>
-        <MenuItem onClick={deleteDay}>Borrar</MenuItem>
-      </Menu>
-
-      {/* Botones al pie de la página */}
-      {days.length > 0 && (
-        <Box
-          sx={{
-            marginTop: "auto", // Empuja los botones al fondo
-            padding: 2,
-            display: "flex",
-            justifyContent: "center",
-            gap: 2,
-          }}
-        >
-          <Box
-            sx={{
-              marginTop: 2,
-              position: "absolute",
-              bottom: 0,
-              width: "100%",
-              backgroundColor: "background.paper",
-              padding: 2,
-              display: "flex",
-              justifyContent: "center",
-              gap: 4,
-            }}
+    <div className="w-[95vw] flex flex-col h-[90vh] justify-center">
+      <div className="mt-1">
+        {days.map((day) => (
+          <div
+            key={day.timestampEntrada}
+            className="border-b py-2 flex justify-between"
           >
-            <Button
-              color="secondary"
-              onClick={() => {
-                navigate("/results");
-              }}
-            >
-              Calcular Cierre
-            </Button>
-            <Button onClick={deleteAllDays}>Borrar todos</Button>
-          </Box>
-        </Box>
+            <div>
+              <p className="font-medium">
+                Fecha: {(() => {
+                  const fechaProcesada = new Date(day.fechaEntrada);
+                  fechaProcesada.setDate(fechaProcesada.getDate() + 1);
+                  return fechaProcesada.toLocaleDateString("es-AR", {
+                    year: "numeric",
+                    month: "2-digit",
+                    day: "2-digit",
+                  });
+                })()} - Jornada de {day.tipoJornada} horas
+              </p>
+              <p className="text-sm text-gray-600">
+                Entrada: {day.horaEntrada} - Salida: {day.horaSalida} {" "}
+                {day.penalidad ? `- Penalty: ${day.minutosPenalidad} min` : ""}
+              </p>
+            </div>
+            <div className="relative">
+              <button
+                onClick={() => setMenuDay(day)}
+                aria-label="menu"
+                className="p-1 text-xl"
+              >
+                ⋮
+              </button>
+              {menuDay === day && (
+                <div className="absolute right-0 mt-2 w-28 bg-white border rounded shadow">
+                  <button
+                    className="block w-full text-left px-4 py-2 hover:bg-gray-100"
+                    onClick={() => {
+                      setMenuDay(null);
+                      navigate(`/editar/${day.timestampEntrada}`);
+                    }}
+                  >
+                    Editar
+                  </button>
+                  <button
+                    className="block w-full text-left px-4 py-2 hover:bg-gray-100"
+                    onClick={() => {
+                      setMenuDay(null);
+                      deleteDay(day);
+                    }}
+                  >
+                    Borrar
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {days.length > 0 && (
+        <div className="mt-auto p-2 flex justify-center gap-4">
+          <button
+            className="bg-teal-500 text-white px-4 py-2 rounded"
+            onClick={() => navigate("/results")}
+          >
+            Calcular Cierre
+          </button>
+          <button
+            className="bg-red-600 text-white px-4 py-2 rounded"
+            onClick={deleteAllDays}
+          >
+            Borrar todos
+          </button>
+        </div>
       )}
-    </Box>
+    </div>
   );
 };
 

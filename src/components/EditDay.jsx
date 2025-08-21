@@ -1,24 +1,11 @@
-import {
-  Box,
-  Button,
-  Checkbox,
-  FormControl,
-  FormControlLabel,
-  InputLabel,
-  MenuItem,
-  Select,
-  TextField,
-  Typography,
-} from "@mui/material";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { validateDay, isFormValid } from "../utils/validations";
+import { validateDay } from "../utils/validations";
 
 const EditDay = () => {
   const { timestampEntrada } = useParams();
   const navigate = useNavigate();
 
-  // Cargar los días desde el localStorage y encontrar el día que corresponde al timestamp
   const existingDays = JSON.parse(localStorage.getItem("days")) || [];
   const dayToEdit = existingDays.find(
     (day) => day.timestampEntrada === Number(timestampEntrada)
@@ -36,8 +23,8 @@ const EditDay = () => {
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setForm((prevForm) => ({
-      ...prevForm,
+    setForm((prev) => ({
+      ...prev,
       [name]: type === "checkbox" ? checked : value,
     }));
   };
@@ -45,11 +32,8 @@ const EditDay = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    // Crear timestamps temporales para validación
     const fechaEntrada = new Date(form.fechaEntrada);
-    const [horasEntrada, minutosEntrada] = form.horaEntrada
-      .split(":")
-      .map(Number);
+    const [horasEntrada, minutosEntrada] = form.horaEntrada.split(":").map(Number);
     fechaEntrada.setHours(horasEntrada, minutosEntrada, 0, 0);
     const nuevoTimestampEntrada = fechaEntrada.getTime();
 
@@ -64,12 +48,10 @@ const EditDay = () => {
       timestampSalida: nuevoTimestampSalida,
     };
 
-    // Leer jornadas existentes ignorando la actual jornada (usando el original)
     const filteredDays = existingDays.filter(
       (day) => day.timestampEntrada !== Number(timestampEntrada)
     );
 
-    // Validar el día
     const errors = validateDay(updatedDay, filteredDays);
 
     if (errors.length > 0) {
@@ -77,160 +59,107 @@ const EditDay = () => {
       return;
     }
 
-    // Actualizar la jornada en el array existente
     const updatedDays = existingDays.map((day) =>
       day.timestampEntrada === Number(timestampEntrada) ? updatedDay : day
     );
 
-    // Guardar jornadas actualizadas en localStorage
     localStorage.setItem("days", JSON.stringify(updatedDays));
     navigate("/");
   };
 
   return (
-    <Box
-      component="form"
-      onSubmit={handleSubmit}
-      padding={2}
-      sx={{
-        width: "100vw",
-      }}
-    >
-      <FormControl
-        fullWidth
-        margin="normal"
-      >
-        <InputLabel id="tipoJornada-label">Tipo de Jornada</InputLabel>
-        <Select
-          labelId="tipoJornada-label"
+    <form onSubmit={handleSubmit} className="p-4 w-screen">
+      <div className="mb-4">
+        <label htmlFor="tipoJornada" className="block">Tipo de Jornada</label>
+        <select
           id="tipoJornada"
           name="tipoJornada"
           value={form.tipoJornada}
           onChange={handleChange}
-          label="Tipo de Jornada"
           required
+          className="w-full border rounded p-2 mt-1"
         >
-          <MenuItem value={8}>8 horas</MenuItem>
-          <MenuItem value={12}>12 horas</MenuItem>
-        </Select>
-      </FormControl>
+          <option value="">Seleccionar</option>
+          <option value={8}>8 horas</option>
+          <option value={12}>12 horas</option>
+        </select>
+      </div>
 
-      <TextField
-        label="Fecha de Entrada"
-        type="date"
-        name="fechaEntrada"
-        value={form.fechaEntrada}
-        onChange={handleChange}
-        fullWidth
-        InputLabelProps={{
-          shrink: true,
-        }}
-        margin="normal"
-        required
-      />
-
-      <TextField
-        label="Hora de Entrada"
-        type="time"
-        name="horaEntrada"
-        value={form.horaEntrada}
-        onChange={handleChange}
-        fullWidth
-        InputLabelProps={{
-          shrink: true,
-        }}
-        margin="normal"
-        required
-      />
-
-      <TextField
-        label="Fecha de Salida"
-        type="date"
-        name="fechaSalida"
-        value={form.fechaSalida}
-        onChange={handleChange}
-        fullWidth
-        InputLabelProps={{
-          shrink: true,
-        }}
-        margin="normal"
-        required
-      />
-
-      <TextField
-        label="Hora de Salida"
-        type="time"
-        name="horaSalida"
-        value={form.horaSalida}
-        onChange={handleChange}
-        fullWidth
-        InputLabelProps={{
-          shrink: true,
-        }}
-        margin="normal"
-        required
-      />
-
-      <Box
-        display="flex"
-        sx={{
-          flex: "0 0 300px",
-        }}
-      >
-        <FormControlLabel
-          control={
-            <Checkbox
-              name="penalidad"
-              checked={form.penalidad}
-              onChange={handleChange}
-            />
-          }
-          label="Penalty"
-          sx={{ margin: "normal", height: "100%" }}
+      <div className="mb-4">
+        <label className="block">Fecha de Entrada</label>
+        <input
+          type="date"
+          name="fechaEntrada"
+          value={form.fechaEntrada}
+          onChange={handleChange}
+          required
+          className="w-full border rounded p-2 mt-1"
         />
+      </div>
+
+      <div className="mb-4">
+        <label className="block">Hora de Entrada</label>
+        <input
+          type="time"
+          name="horaEntrada"
+          value={form.horaEntrada}
+          onChange={handleChange}
+          required
+          className="w-full border rounded p-2 mt-1"
+        />
+      </div>
+
+      <div className="mb-4">
+        <label className="block">Fecha de Salida</label>
+        <input
+          type="date"
+          name="fechaSalida"
+          value={form.fechaSalida}
+          onChange={handleChange}
+          required
+          className="w-full border rounded p-2 mt-1"
+        />
+      </div>
+
+      <div className="mb-4">
+        <label className="block">Hora de Salida</label>
+        <input
+          type="time"
+          name="horaSalida"
+          value={form.horaSalida}
+          onChange={handleChange}
+          required
+          className="w-full border rounded p-2 mt-1"
+        />
+      </div>
+
+      <div className="flex items-center mb-4">
+        <input
+          type="checkbox"
+          name="penalidad"
+          checked={form.penalidad}
+          onChange={handleChange}
+          className="mr-2"
+        />
+        <label>Penalty</label>
         {form.penalidad && (
-          <TextField
-            label="Minutos de Penalty"
+          <input
             type="number"
             name="minutosPenalidad"
             value={form.minutosPenalidad}
             onChange={handleChange}
-            margin="normal"
             required
+            className="ml-4 border rounded p-2 w-32"
           />
         )}
-      </Box>
-      <Box
-        sx={{
-          marginTop: "auto", // Empuja los botones al fondo
-          padding: 2,
-          display: "flex",
-          justifyContent: "center",
-          gap: 2,
-        }}
-      >
-        <Box
-          sx={{
-            marginTop: 2,
-            position: "absolute",
-            bottom: 0,
-            width: "100%",
-            backgroundColor: "background.paper",
-            padding: 2,
-            display: "flex",
-            justifyContent: "center",
-            gap: 4,
-          }}
-        >
-          <Button
-            type="submit"
-            color="primary"
-          >
-            Guardar
-          </Button>
-        </Box>
-      </Box>
-    </Box>
+      </div>
+
+      <div className="mt-4 flex justify-center">
+        <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded">
+          Guardar
+        </button>
+      </div>
+    </form>
   );
 };
 

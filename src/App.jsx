@@ -1,5 +1,4 @@
 import { Routes, Route } from "react-router-dom";
-import { Container } from "@mui/material";
 import Navbar from "./components/Navbar";
 import Home from "./pages/Home";
 import CreateDays from "./components/CreateDays";
@@ -10,36 +9,14 @@ function App() {
   return (
     <>
       <Navbar />
-      <Container
-        maxWidth="lg"
-        sx={{
-          mt: 2,
-          // justifyContent: "center",
-          alignItems: "center",
-          display: "flex",
-          flexDirection: "column",
-        }}
-      >
+      <div className="container mx-auto mt-2 flex flex-col items-center">
         <Routes>
-          <Route
-            path="/"
-            element={<Home />}
-          />
-
-          <Route
-            path="/nuevo"
-            element={<CreateDays />}
-          />
-          <Route
-            path="/results"
-            element={<ResultsView />}
-          />
-          <Route
-            path="/editar/:timestampEntrada"
-            element={<EditDay />}
-          />
+          <Route path="/" element={<Home />} />
+          <Route path="/nuevo" element={<CreateDays />} />
+          <Route path="/results" element={<ResultsView />} />
+          <Route path="/editar/:timestampEntrada" element={<EditDay />} />
         </Routes>
-      </Container>
+      </div>
     </>
   );
 }
